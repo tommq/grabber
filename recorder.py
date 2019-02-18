@@ -1,60 +1,58 @@
-"""
-PyAudio example: Record a few seconds of audio and save to a WAVE
-file.
-"""
-import pyaudio
-import wave
-import sys
+import Queue
+
+import sounddevice as sd
+import soundfile as sf
+import utils
+import threading
+import numpy
+import config
+
+assert numpy
 
 
 class Recorder:
+    thread = None
+    uuid = ""
+    go = True
 
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    RATE = 44100
-    RECORD_SECONDS = 5
-    WAVE_OUTPUT_FILENAME = "output.wav"
-    stream = None
+    def __init__(self, uuid):
+        self.uuid = uuid
 
-    def __init__(self):
-        pass
+    def record(self):
+        try:
+            q = Queue.Queue()
+
+            def callback(indata, frames, time, status):
+                """This is called (from a separate thread) for each audio block."""
+                if status:
+                    print(status)
+                q.put(indata.copy())
+
+            filename = "resources/recordings/" + self.uuid + '.wav'
+
+            # Make sure the file is opened before recording anything:
+            with sf.SoundFile(filename, mode='x', samplerate=config.samplerate,
+                              channels=config.channels, subtype=config.subtype) as audio_file:
+                with sd.InputStream(samplerate=config.samplerate, device=config.device,
+                                    channels=config.channels, callback=callback):
+                    print('#' * 80)
+                    print('recording')
+                    print('#' * 80)
+
+                    begin_timestamp = utils.getitimestamp()
+                    while self.go is True:
+                        audio_file.write(q.get())
+                    end_timestamp = utils.getitimestamp()
+                    audio_file.__setattr__("comment", str(begin_timestamp) + '&' + str(end_timestamp))
+                    audio_file.close()
+                    print("Finished writing file")
+
+        except Exception as e:
+            print("Ex in recording" + str(e))
 
     def start_recording(self):
-        if sys.platform == 'darwin':
-            CHANNELS = 1
+        self.thread = threading.Thread(target=self.record)
+        self.thread.start()
 
-        p = pyaudio.PyAudio()
-
-        stream = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK)
-
-        print("* recording")
-
-        frames = []
-
-        for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-            data = stream.read(CHUNK)
-            frames.append(data)
-
-
-
-    def end_recording(self):
-        print("* done recording")
-
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
-
-        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(p.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))
-        wf.close()
-
-
-
+    def stop_recording(self):
+        self.go = False

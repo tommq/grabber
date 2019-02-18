@@ -1,20 +1,24 @@
-import grabber
+import time
+
+import ui
 import uuid
 import sys
-import processor
+import soundextractor
 
 #   todo add sound processing - removing pauses
 
 unique_id = str(uuid.uuid4())[:8]
-print(unique_id)
+print("Generated id: ", unique_id)
 
 try:
 
-    processor = processor.Processor("5f8da151")
-    processor.extract_key_presses()
-    grabber = grabber.Grabber(unique_id)
+    grabber = ui.UI(unique_id)
     grabber.build_ui()
+    time.sleep(0.5)
+    processor = soundextractor.SoundExtractor(unique_id)
+    processor.extract_key_presses()
 
-except Exception:
+except Exception as ex:
+    print("Silly me", ex)
     sys.exit(0)
 

@@ -39,17 +39,18 @@ class Dictionary:
             words += self.written[time]
         contents = "".join(words)
         contents = contents.replace(" ", "*")
-        print(contents)
+        print("Written: " + contents)
 
         for char in contents:
             spaced += char + "\n"
 
-        print(spaced)
         with open(r"resources/recordings/" + self.uuid + ".txt", 'w+') as f:
             f.write(spaced)
 
     def saveJson(self):
         for timestamp in self.written.keys():
             self.written[str(timestamp)] = self.written.pop(timestamp)
-        with open(r"resources/recordings/" + self.uuid + ".json", 'w+') as f:
+        filename = r"resources/recordings/" + self.uuid + ".json"
+        with open(filename, 'w+') as f:
             f.write(json.dumps(self.written, ensure_ascii=False))
+            print("Saved to: " + filename)

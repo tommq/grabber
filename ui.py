@@ -1,6 +1,6 @@
 from Tkinter import *
 
-import sdsrecorder
+import recorder
 import utils
 from dictionary import Dictionary
 
@@ -16,26 +16,28 @@ from dictionary import Dictionary
 #  extract segment for each keypress, then join them in resulting audio and save to file
 
 
-class Grabber:
+class UI:
     characters_to_write = 0
     dictionary = None
     written = dict()
     uuid = ""
     recorder = None
+    ui_root = None
 
     def __init__(self, uuid):
         self.uuid = uuid
         self.dictionary = Dictionary(uuid)
-        self.recorder = sdsrecorder.Recorder(uuid)
+        self.recorder = recorder.Recorder(uuid)
         self.recorder.start_recording()
+        self.ui_root = Tk()
 
     def finish_btc_clicked(self):
         print("Finish clicked")
-        print("Sending ", self.written)
+        # print("Sending ", self.written)
         self.dictionary.save_written(self.written)
         self.dictionary.save_to_file()
         self.recorder.stop_recording()
-        sys.exit(0)
+        self.ui_root.destroy()
 
     def start_btc_clicked(self):
         print("Start clicked")
@@ -49,11 +51,10 @@ class Grabber:
     def build_ui(self):
 
         try:
-            root = Tk()
-            root.geometry('600x400')
+            self.ui_root.geometry('600x400')
 
             # main frame
-            main_frame = Frame(root)
+            main_frame = Frame(self.ui_root)
             main_frame.grid()
 
             # label
@@ -70,6 +71,7 @@ class Grabber:
             user_text_input = Entry(main_frame, textvariable=input_val, width=40,
                                     font=("Arial Bold", 15))
             user_text_input.grid(column=0, row=2)
+            user_text_input.focus()
 
             def user_value_changed(a, b, c):
                 timestamp = utils.getitimestamp()
@@ -82,7 +84,7 @@ class Grabber:
             input_val.trace('w', user_value_changed)
 
             # button frame
-            button_frame = Frame(root, pady=15)
+            button_frame = Frame(self.ui_root, pady=15)
             button_frame.grid(column=0, row=3)
 
             # start button
@@ -114,9 +116,9 @@ class Grabber:
             progress_label.grid(column=6, row=0)
 
             self.show_words(prompt_text)
-            root.mainloop()
-        except Exception:
-            raise Exception("Fuck OOP")
+            self.ui_root.mainloop()
+        except Exception as ex:
+            raise Exception(ex)
 
     def append_text(self, text_widget, value):
         self.characters_to_write += len(value)
