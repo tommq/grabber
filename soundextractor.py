@@ -1,5 +1,6 @@
 import Queue
 import json
+import sys
 
 import sounddevice as sd
 import soundfile as sf
@@ -14,18 +15,20 @@ class SoundExtractor:
     key_presses = dict()
     recording = None
     samplerate = 0
-    press_width = 0
     start_time = None
     end_time = None
+    stroke_time = None
+    input_audiofile = None
 
-    def __init__(self, uuid, width=0.3):
+    def __init__(self, uuid):
         self.uuid = uuid
-        self.press_width = width
+        self.input_audiofile = "resources/recordings/" + self.uuid + "_raw.wav"
+        self.stroke_time = config.stroke_time
         print("#################  EXTRACTOR #################")
 
     def get_audio(self):
-        self.parse_info(sf.info("resources/recordings/" + self.uuid + ".wav", True))
-        self.recording, self.samplerate = sf.read("resources/recordings/" + self.uuid + ".wav")
+        self.parse_info(sf.info(self.input_audiofile, True))
+        self.recording, self.samplerate = sf.read(self.input_audiofile)
 
     def get_json(self):
         try:
@@ -67,7 +70,7 @@ class SoundExtractor:
             q.put(indata.copy())
 
         try:
-            with sf.SoundFile("resources/recordings/" + self.uuid + "_proc.wav", mode='x', samplerate=config.samplerate,
+            with sf.SoundFile("resources/recordings/" + self.uuid + ".wav", mode='x', samplerate=config.samplerate,
                               channels=config.channels, subtype=config.subtype) as output_file:
                 with sd.InputStream(samplerate=self.samplerate, device=config.device,
                                     channels=config.channels, callback=callback):
@@ -75,19 +78,18 @@ class SoundExtractor:
                     print("Start of recording " + str(self.start_time))
                     data_size = len(self.recording)
                     print("Data size: " + str(data_size) + " shape: " + str(self.recording.shape))
-                    input_file = sf.SoundFile("resources/recordings/" + self.uuid + ".wav")
+                    input_file = sf.SoundFile(self.input_audiofile)
                     for keypress in sorted(self.key_presses.keys()):
                         relative_time = keypress - self.start_time
-                        start_block = int((relative_time.total_seconds() - self.press_width) * self.samplerate)
-                        end_block = int((relative_time.total_seconds() + self.press_width) * self.samplerate)
+                        start_block = int((relative_time.total_seconds() - self.stroke_time) * self.samplerate)
+                        end_block = int((relative_time.total_seconds() + self.stroke_time) * self.samplerate)
 
-                        print(self.key_presses[keypress] + " at " + str(relative_time))
-                        print("Extracting range " + str(start_block) + " to " + str(end_block))
+                        print(self.key_presses[keypress] + " at " + str(relative_time) + " -> extracting range " + str(start_block) + " to " + str(end_block))
                         block_range = end_block-start_block
-                        print("range: " + str(block_range))
+                        # print("range: " + str(block_range))
                         input_file.seek(start_block)
                         audio_buffer = input_file.buffer_read(frames=block_range, dtype='float64')
-                        print(len(audio_buffer))
+                        # print(len(audio_buffer))
                         output_file.buffer_write(audio_buffer, dtype='float64')
 
                     print("End of recording " + str(self.end_time))
@@ -105,4 +107,5 @@ class SoundExtractor:
         print("Total of " + str(len(self.key_presses)) + " key presses")
 
     def exit_prog(self):
-        pri
+        pass
+        # sys.exit(0)

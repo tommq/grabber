@@ -5,13 +5,8 @@ import utils
 from dictionary import Dictionary
 
 
-
-# todo text:
-#  show progress, pick words based oon missing words,,
-#  save map to json?
-
 # todo audio
-#  start, pause, resume, finish recording
+#  start, pause, resume
 #  show recording status
 #  extract segment for each keypress, then join them in resulting audio and save to file
 
@@ -74,12 +69,14 @@ class UI:
             user_text_input.focus()
 
             def user_value_changed(a, b, c):
-                timestamp = utils.getitimestamp()
+                timestamp = utils.get_timestamp()
                 pressed_key = input_val.get()[-1:]
                 self.written[timestamp] = pressed_key
 
                 if len(input_val.get()) == self.characters_to_write:
                     self.writing_completed(user_text_input, prompt_text)
+                    self.update_progress(progress_value)
+
 
             input_val.trace('w', user_value_changed)
 
@@ -87,33 +84,33 @@ class UI:
             button_frame = Frame(self.ui_root, pady=15)
             button_frame.grid(column=0, row=3)
 
-            # start button
-            start_btn = Button(button_frame, text="Start", command=self.start_btc_clicked)
-            start_btn.grid(column=0, row=0)
-
-            # pause button
-            pause_btn = Button(button_frame, text="Pause", command=self.pause_btc_clicked)
-            pause_btn.grid(column=1, row=0)
-
-            # resume button
-            resume_btn = Button(button_frame, text="Resume", command=self.resume_btc_clicked)
-            resume_btn.grid(column=2, row=0)
-
-            # finish button
-            finish_btn = Button(button_frame, text="Finish", command=self.finish_btc_clicked)
-            finish_btn.grid(column=3, row=0)
+            # # start button
+            # start_btn = Button(button_frame, text="Start", command=self.start_btc_clicked)
+            # start_btn.grid(column=0, row=0)
+            #
+            # # pause button
+            # pause_btn = Button(button_frame, text="Pause", command=self.pause_btc_clicked)
+            # pause_btn.grid(column=1, row=0)
+            #
+            # # resume button
+            # resume_btn = Button(button_frame, text="Resume", command=self.resume_btc_clicked)
+            # resume_btn.grid(column=2, row=0)
 
             # recoding status label
             rec_status_label = Label(button_frame, padx=10, text="Not recording", font=("Arial Bold", 10))
-            rec_status_label.grid(column=4, row=0)
+            rec_status_label.grid(column=2, row=0)
 
             # progress percent value
             progress_value = Label(button_frame, padx=0, text="0", font=("Arial Bold", 10))
-            progress_value.grid(column=5, row=0)
+            progress_value.grid(column=3, row=0)
 
             # progress label
-            progress_label = Label(button_frame, padx=0, text="% completed", font=("Arial Bold", 10))
-            progress_label.grid(column=6, row=0)
+            progress_label = Label(button_frame, padx=0, text="% completed   ", font=("Arial Bold", 10))
+            progress_label.grid(column=4, row=0)
+
+            # finish button
+            finish_btn = Button(button_frame, text="Finish", command=self.finish_btc_clicked)
+            finish_btn.grid(column=7, row=0)
 
             self.show_words(prompt_text)
             self.ui_root.mainloop()
@@ -133,15 +130,21 @@ class UI:
     def get_text(self, text_widget):
         return text_widget.get(1.0, END)
 
+    def update_progress(self, progress_value):
+        progress_value['text'] = self.dictionary.get_completion_progress()
+
     def show_words(self, prompt_text):
         self.characters_to_write = 0
         self.clear_text(prompt_text)
         self.append_text(prompt_text, self.dictionary.get_next())
         self.append_text(prompt_text, self.dictionary.get_next())
         self.append_text(prompt_text, self.dictionary.get_next())
-        self.characters_to_write += 2  # spaces between words
+        self.append_text(prompt_text, self.dictionary.get_next())
+        self.append_text(prompt_text, self.dictionary.get_next())
+        self.characters_to_write += 4 # spaces between words
 
     def writing_completed(self, user_input, prompter):
+        self.dictionary.update_letter_counts(user_input.get())
         self.clear_text(user_input)
         self.clear_text(prompter)
         self.show_words(prompter)

@@ -5,13 +5,10 @@ import uuid
 import sys
 import soundextractor
 
-#   todo add sound processing - removing pauses
-
 unique_id = str(uuid.uuid4())[:8]
 print("Generated id: ", unique_id)
 
 try:
-
     grabber = ui.UI(unique_id)
     grabber.build_ui()
     time.sleep(0.5)

@@ -1,9 +1,7 @@
 from datetime import datetime as dt
 
 
-
-
-def getitimestamp():
+def get_timestamp():
     now = dt.now()
     return now
 

@@ -28,7 +28,7 @@ class Recorder:
                     print(status)
                 q.put(indata.copy())
 
-            filename = "resources/recordings/" + self.uuid + '.wav'
+            filename = "resources/recordings/" + self.uuid + '_raw.wav'
 
             # Make sure the file is opened before recording anything:
             with sf.SoundFile(filename, mode='x', samplerate=config.samplerate,
@@ -39,10 +39,10 @@ class Recorder:
                     print('recording')
                     print('#' * 80)
 
-                    begin_timestamp = utils.getitimestamp()
+                    begin_timestamp = utils.get_timestamp()
                     while self.go is True:
                         audio_file.write(q.get())
-                    end_timestamp = utils.getitimestamp()
+                    end_timestamp = utils.get_timestamp()
                     audio_file.__setattr__("comment", str(begin_timestamp) + '&' + str(end_timestamp))
                     audio_file.close()
                     print("Finished writing file")
