@@ -56,9 +56,9 @@ class Dictionary:
                 if self.letter_counts[key] <= self.min_strokes:
                     self.letter_counts[key] = self.letter_counts[key]+1
 
-    def save_to_file(self):
-        self.save_txt()
-        self.saveJson()
+    def save_to_file(self, start):
+        # self.save_txt()
+        self.save_json(start)
 
     def save_txt(self):
         spaced = ""
@@ -75,7 +75,8 @@ class Dictionary:
         with open(r"resources/recordings/" + self.uuid + ".txt", 'w+') as f:
             f.write(spaced)
 
-    def saveJson(self):
+    def save_json(self, start):
+        self.written_letters[str(start)] = "start"
         for timestamp in self.written_letters.keys():
             self.written_letters[str(timestamp)] = self.written_letters.pop(timestamp)
         filename = r"resources/recordings/" + self.uuid + ".json"

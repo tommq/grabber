@@ -14,6 +14,7 @@ class Recorder:
     thread = None
     uuid = ""
     go = True
+    dictionary = None
 
     def __init__(self, uuid):
         self.uuid = uuid
@@ -28,7 +29,7 @@ class Recorder:
                     print(status)
                 q.put(indata.copy())
 
-            filename = "resources/recordings/" + self.uuid + '_raw.wav'
+            filename = "resources/recordings/" + self.uuid + '.wav'
 
             # Make sure the file is opened before recording anything:
             with sf.SoundFile(filename, mode='x', samplerate=config.samplerate,
@@ -43,16 +44,21 @@ class Recorder:
                     while self.go is True:
                         audio_file.write(q.get())
                     end_timestamp = utils.get_timestamp()
+                    self.save_start_end(begin_timestamp)
                     audio_file.__setattr__("comment", str(begin_timestamp) + '&' + str(end_timestamp))
                     audio_file.close()
                     print("Finished writing file")
 
         except Exception as e:
-            print("Ex in recording" + str(e))
+            print("Ex in recording " + str(e))
 
     def start_recording(self):
         self.thread = threading.Thread(target=self.record)
         self.thread.start()
 
-    def stop_recording(self):
+    def save_start_end(self, start):
+        self.dictionary.save_to_file(start)
+
+    def stop_recording(self, dictionary):
+        self.dictionary = dictionary
         self.go = False

@@ -5,12 +5,6 @@ import utils
 from dictionary import Dictionary
 
 
-# todo audio
-#  start, pause, resume
-#  show recording status
-#  extract segment for each keypress, then join them in resulting audio and save to file
-
-
 class UI:
     characters_to_write = 0
     dictionary = None
@@ -28,10 +22,9 @@ class UI:
 
     def finish_btc_clicked(self):
         print("Finish clicked")
-        # print("Sending ", self.written)
         self.dictionary.save_written(self.written)
-        self.dictionary.save_to_file()
-        self.recorder.stop_recording()
+        self.recorder.stop_recording(self.dictionary)
+        # print("Sending ", self.written)
         self.ui_root.destroy()
 
     def start_btc_clicked(self):
