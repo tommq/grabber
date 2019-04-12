@@ -57,7 +57,7 @@ class Dictionary:
                     self.letter_counts[key] = self.letter_counts[key]+1
 
     def save_to_file(self, start):
-        # self.save_txt()
+        self.save_txt()
         self.save_json(start)
 
     def save_txt(self):
@@ -66,11 +66,11 @@ class Dictionary:
         for time in sorted(self.written_letters.keys()):
             words += self.written_letters[time]
         contents = "".join(words)
-        contents = contents.replace(" ", "*")
+        # contents = contents.replace(" ", "*")
         print("Written: " + contents)
 
-        for char in contents:
-            spaced += char + "\n"
+        # for char in contents:
+        #     spaced += char + "\n"
 
         with open(r"resources/recordings/" + self.uuid + ".txt", 'w+') as f:
             f.write(spaced)
