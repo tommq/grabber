@@ -1,6 +1,7 @@
 import csv
 import random
 import json
+from collections import Counter
 
 import config
 
@@ -33,6 +34,7 @@ class Dictionary:
                         self.wordlist += row
 
     def get_next(self):
+        print(self.letter_counts)
         character = min(self.letter_counts, key=self.letter_counts.get)
         return self.get_next_cointaining(character)
 
@@ -68,14 +70,15 @@ class Dictionary:
         contents = "".join(words)
         print("Written: " + contents)
 
-        with open(r"resources/recordings/" + self.uuid + ".txt", 'w+') as f:
+        with open(config.directory + self.uuid + ".txt", 'w+') as f:
             f.write(spaced)
 
     def save_json(self, start):
+        print("saving: ", Counter(self.written_letters))
         self.written_letters[str(start)] = "start"
         for timestamp in self.written_letters.keys():
             self.written_letters[str(timestamp)] = self.written_letters.pop(timestamp)
-        filename = r"resources/recordings/" + self.uuid + ".json"
+        filename = config.directory + self.uuid + ".json"
         with open(filename, 'w+') as f:
             f.write(json.dumps(self.written_letters, ensure_ascii=False))
             print("Saved to: " + filename)

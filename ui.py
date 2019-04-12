@@ -1,7 +1,7 @@
 import tkinter as tk
 import recorder
-import utils
 from dictionary import Dictionary
+from datetime import datetime as dt
 
 
 class UI:
@@ -11,12 +11,15 @@ class UI:
     uuid = ""
     recorder = None
     ui_root = None
+    start = None
 
     def __init__(self, uuid):
         self.uuid = uuid
         self.dictionary = Dictionary(uuid)
         self.recorder = recorder.Recorder(uuid)
         self.recorder.start_recording()
+        self.start = dt.now()
+        print("UI start" + str(self.start))
         self.ui_root = tk.Tk()
 
     def finish_btc_clicked(self):
@@ -56,19 +59,20 @@ class UI:
             input_val = tk.StringVar()
             input_val.set('')
             user_text_input = tk.Entry(main_frame, textvariable=input_val, width=40,
-                                    font=("Arial Bold", 15))
+                                       font=("Arial Bold", 15))
             user_text_input.grid(column=0, row=2)
             user_text_input.focus()
 
             def user_value_changed(a, b, c):
-                timestamp = utils.get_timestamp()
+                timestamp = dt.now()
+                print("##PRESS##" + str((timestamp-self.start).total_seconds()))
                 pressed_key = input_val.get()[-1:]
                 self.written[timestamp] = pressed_key
+                self.dictionary.update_letter_counts(pressed_key)
 
                 if len(input_val.get()) == self.characters_to_write:
                     self.writing_completed(user_text_input, prompt_text)
                     self.update_progress(progress_value)
-
 
             input_val.trace('w', user_value_changed)
 
@@ -133,11 +137,30 @@ class UI:
         self.append_text(prompt_text, self.dictionary.get_next())
         self.append_text(prompt_text, self.dictionary.get_next())
         self.append_text(prompt_text, self.dictionary.get_next())
-        self.characters_to_write += 4 # spaces between words
+        self.characters_to_write += 5  # spaces between words
+
+    def update_words(self, prompt_text, user_input):
+        self.characters_to_write = 0
+        old = self.get_text(prompt_text).replace("\n", "")
+        print("old: " + old)
+        new_word = self.dictionary.get_next() + " "
+        remaining_text = ' '.join(old.split(' ')[1:])
+        new = remaining_text + new_word
+        print("new: " + new)
+
+        remaining_words = len(new_word) + len(remaining_text)
+
+        self.clear_text(prompt_text)
+        self.clear_text(user_input)
+
+        user_input.insert(tk.INSERT, remaining_text)
+        self.characters_to_write = remaining_words
+        prompt_text.insert(tk.INSERT, new)
+        # self.append_text(prompt_text, new)
 
     def writing_completed(self, user_input, prompter):
-        self.dictionary.update_letter_counts(user_input.get())
-        self.clear_text(user_input)
-        self.clear_text(prompter)
-        self.show_words(prompter)
-
+        # self.dictionary.update_letter_counts(user_input.get())
+        # self.clear_text(user_input)
+        # self.clear_text(prompter)
+        # self.show_words(prompter)
+        self.update_words(prompter, user_input)
