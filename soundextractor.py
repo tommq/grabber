@@ -1,6 +1,5 @@
-import Queue
+import queue
 import json
-import sys
 
 import sounddevice as sd
 import soundfile as sf
@@ -61,7 +60,7 @@ class SoundExtractor:
 
     def create_output_file(self):
 
-        q = Queue.Queue()
+        q = queue.Queue()
 
         def callback(indata, frames, time, status):
             """This is called (from a separate thread) for each audio block."""
@@ -98,7 +97,6 @@ class SoundExtractor:
             self.exit_prog()
         except Exception as ex:
             print("Dang it" + str(ex))
-
 
     def load_files(self):
         self.get_audio()

@@ -1,5 +1,4 @@
-import Queue
-
+import queue
 import sounddevice as sd
 import soundfile as sf
 import utils
@@ -21,7 +20,7 @@ class Recorder:
 
     def record(self):
         try:
-            q = Queue.Queue()
+            q = queue.Queue()
 
             def callback(indata, frames, time, status):
                 """This is called (from a separate thread) for each audio block."""

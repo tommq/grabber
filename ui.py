@@ -1,5 +1,4 @@
-from Tkinter import *
-
+import tkinter as tk
 import recorder
 import utils
 from dictionary import Dictionary
@@ -18,7 +17,7 @@ class UI:
         self.dictionary = Dictionary(uuid)
         self.recorder = recorder.Recorder(uuid)
         self.recorder.start_recording()
-        self.ui_root = Tk()
+        self.ui_root = tk.Tk()
 
     def finish_btc_clicked(self):
         print("Finish clicked")
@@ -42,21 +41,21 @@ class UI:
             self.ui_root.geometry('600x400')
 
             # main frame
-            main_frame = Frame(self.ui_root)
+            main_frame = tk.Frame(self.ui_root)
             main_frame.grid()
 
             # label
-            name_label = Label(main_frame, text="Audio & Key Grabber", font=("Arial Bold", 15))
+            name_label = tk.Label(main_frame, text="Audio & Key Grabber", font=("Arial Bold", 15))
             name_label.grid(column=0, row=0)
 
-            prompt_text = Text(main_frame, bd=2, padx=30, pady=15, font=("Arial Bold", 15), width=40, height=3)
-            prompt_text.insert(INSERT, "Text to write will appear here")
+            prompt_text = tk.Text(main_frame, bd=2, padx=30, pady=15, font=("Arial Bold", 15), width=40, height=3)
+            prompt_text.insert(tk.INSERT, "Text to write will appear here")
             prompt_text.grid(column=0, row=1)
 
             # user text input
-            input_val = StringVar()
+            input_val = tk.StringVar()
             input_val.set('')
-            user_text_input = Entry(main_frame, textvariable=input_val, width=40,
+            user_text_input = tk.Entry(main_frame, textvariable=input_val, width=40,
                                     font=("Arial Bold", 15))
             user_text_input.grid(column=0, row=2)
             user_text_input.focus()
@@ -74,7 +73,7 @@ class UI:
             input_val.trace('w', user_value_changed)
 
             # button frame
-            button_frame = Frame(self.ui_root, pady=15)
+            button_frame = tk.Frame(self.ui_root, pady=15)
             button_frame.grid(column=0, row=3)
 
             # # start button
@@ -90,19 +89,19 @@ class UI:
             # resume_btn.grid(column=2, row=0)
 
             # recoding status label
-            rec_status_label = Label(button_frame, padx=10, text="Not recording", font=("Arial Bold", 10))
+            rec_status_label = tk.Label(button_frame, padx=10, text="", font=("Arial Bold", 10))
             rec_status_label.grid(column=2, row=0)
 
             # progress percent value
-            progress_value = Label(button_frame, padx=0, text="0", font=("Arial Bold", 10))
+            progress_value = tk.Label(button_frame, padx=0, text="0", font=("Arial Bold", 10))
             progress_value.grid(column=3, row=0)
 
             # progress label
-            progress_label = Label(button_frame, padx=0, text="% completed   ", font=("Arial Bold", 10))
+            progress_label = tk.Label(button_frame, padx=0, text="% completed   ", font=("Arial Bold", 10))
             progress_label.grid(column=4, row=0)
 
             # finish button
-            finish_btn = Button(button_frame, text="Finish", command=self.finish_btc_clicked)
+            finish_btn = tk.Button(button_frame, text="Finish", command=self.finish_btc_clicked)
             finish_btn.grid(column=7, row=0)
 
             self.show_words(prompt_text)
@@ -112,16 +111,16 @@ class UI:
 
     def append_text(self, text_widget, value):
         self.characters_to_write += len(value)
-        text_widget.insert(INSERT, value + " ")
+        text_widget.insert(tk.INSERT, value + " ")
 
     def clear_text(self, text_widget):
         if text_widget.widgetName == "text":
-            text_widget.delete(1.0, END)
+            text_widget.delete(1.0, tk.END)
         else:
-            text_widget.delete(0, END)
+            text_widget.delete(0, tk.END)
 
     def get_text(self, text_widget):
-        return text_widget.get(1.0, END)
+        return text_widget.get(1.0, tk.END)
 
     def update_progress(self, progress_value):
         progress_value['text'] = self.dictionary.get_completion_progress()
