@@ -25,7 +25,7 @@ class Dictionary:
             self.letter_counts[character] = 0
 
     def load_words(self):
-        with open('resources/wordlist') as csvDataFile:
+        with open('resources/words_alpha.txt') as csvDataFile:
             csv_reader = csv.reader(csvDataFile)
             for row in csv_reader:
                 if len(row) > 0:
@@ -48,7 +48,7 @@ class Dictionary:
 
     def save_written(self, values):
         for key in sorted(values):
-            self.written_letters[key] = values[key]
+            self.written_letters[str(key)] = values[key]
 
     def update_letter_counts(self, values):
         for key in values:
@@ -57,7 +57,7 @@ class Dictionary:
                     self.letter_counts[key] = self.letter_counts[key]+1
 
     def save_to_file(self, start):
-        self.save_txt()
+        # self.save_txt()
         self.save_json(start)
 
     def save_txt(self):
@@ -66,11 +66,7 @@ class Dictionary:
         for time in sorted(self.written_letters.keys()):
             words += self.written_letters[time]
         contents = "".join(words)
-        # contents = contents.replace(" ", "*")
         print("Written: " + contents)
-
-        # for char in contents:
-        #     spaced += char + "\n"
 
         with open(r"resources/recordings/" + self.uuid + ".txt", 'w+') as f:
             f.write(spaced)

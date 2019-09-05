@@ -42,9 +42,10 @@ class Recorder:
                     begin_timestamp = utils.get_timestamp()
                     while self.go is True:
                         audio_file.write(q.get())
-                    end_timestamp = utils.get_timestamp()
-                    self.save_start_end(begin_timestamp)
-                    audio_file.__setattr__("comment", str(begin_timestamp) + '&' + str(end_timestamp))
+                    print("Recording stopped")
+                    # end_timestamp = utils.get_timestamp()
+                    self.save_start(begin_timestamp)
+                    # audio_file.__setattr__("comment", str(begin_timestamp) + '&' + str(end_timestamp))
                     audio_file.close()
                     print("Finished writing file")
 
@@ -55,7 +56,7 @@ class Recorder:
         self.thread = threading.Thread(target=self.record)
         self.thread.start()
 
-    def save_start_end(self, start):
+    def save_start(self, start):
         self.dictionary.save_to_file(start)
 
     def stop_recording(self, dictionary):
