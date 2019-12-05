@@ -69,6 +69,7 @@ class UI:
                 pressed_key = input_val.get()[-1:]
                 self.written[timestamp] = pressed_key
                 self.dictionary.update_letter_counts(pressed_key)
+                print("LATE" + str(self.recorder.streamOuter.time))
 
                 if len(input_val.get()) == self.characters_to_write:
                     self.writing_completed(user_text_input, prompt_text)

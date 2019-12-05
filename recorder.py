@@ -40,7 +40,6 @@ class Recorder:
                                     channels=config.channels, callback=callback) as stream:
                     begin_timestamp = dt.now()
                     self.streamOuter = stream
-                    stream.time()
                     print('#' * 80)
                     print('recording from')
                     print('#' * 80)
