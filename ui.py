@@ -26,17 +26,7 @@ class UI:
         print("Finish clicked")
         self.dictionary.save_written(self.written)
         self.recorder.stop_recording(self.dictionary)
-        # print("Sending ", self.written)
         self.ui_root.destroy()
-
-    def start_btc_clicked(self):
-        print("Start clicked")
-
-    def pause_btc_clicked(self):
-        print("Pause clicked")
-
-    def resume_btc_clicked(self):
-        print("Resume clicked")
 
     def build_ui(self):
 
@@ -65,11 +55,11 @@ class UI:
 
             def user_value_changed(a, b, c):
                 timestamp = dt.now()
-                print("##PRESS##" + str((timestamp-self.start).total_seconds()))
+                # print("##PRESS##" + str((timestamp-self.start).total_seconds()))
                 pressed_key = input_val.get()[-1:]
                 self.written[timestamp] = pressed_key
                 self.dictionary.update_letter_counts(pressed_key)
-                print("LATE" + str(self.recorder.streamOuter.time))
+                # print("LATE" + str(self.recorder.streamOuter.time()))
 
                 if len(input_val.get()) == self.characters_to_write:
                     self.writing_completed(user_text_input, prompt_text)
@@ -143,11 +133,11 @@ class UI:
     def update_words(self, prompt_text, user_input):
         self.characters_to_write = 0
         old = self.get_text(prompt_text).replace("\n", "")
-        print("old: " + old)
+        # print("old: " + old)
         new_word = self.dictionary.get_next() + " "
         remaining_text = ' '.join(old.split(' ')[1:])
         new = remaining_text + new_word
-        print("new: " + new)
+        # print("new: " + new)
 
         remaining_words = len(new_word) + len(remaining_text)
 
@@ -160,8 +150,4 @@ class UI:
         # self.append_text(prompt_text, new)
 
     def writing_completed(self, user_input, prompter):
-        # self.dictionary.update_letter_counts(user_input.get())
-        # self.clear_text(user_input)
-        # self.clear_text(prompter)
-        # self.show_words(prompter)
         self.update_words(prompter, user_input)

@@ -10,6 +10,6 @@ try:
     grabber = ui.UI(unique_id)
     grabber.build_ui()
 except Exception as ex:
-    print("Silly me", ex)
+    print("Exception: ", ex)
     sys.exit(0)
 
