@@ -74,7 +74,7 @@ class Dictionary:
             f.write(spaced)
 
     def save_json(self, start):
-        print("saving: ", Counter(self.written_letters))
+        # print("saving: ", Counter(self.written_letters))
         self.written_letters[str(start)] = "start"
         for timestamp in self.written_letters.keys():
             self.written_letters[str(timestamp)] = self.written_letters.pop(timestamp)
