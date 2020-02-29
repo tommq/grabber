@@ -54,12 +54,11 @@ class UI:
             user_text_input.focus()
 
             def user_value_changed(a, b, c):
-                timestamp = dt.now()
-                # print("##PRESS##" + str((timestamp-self.start).total_seconds()))
+                timestamp = self.recorder.streamOuter.time
                 pressed_key = input_val.get()[-1:]
                 self.written[timestamp] = pressed_key
                 self.dictionary.update_letter_counts(pressed_key)
-                # print("LATE" + str(self.recorder.streamOuter.time()))
+                # print("Keypress at: " + str(self.recorder.streamOuter.time))
 
                 if len(input_val.get()) == self.characters_to_write:
                     self.writing_completed(user_text_input, prompt_text)
