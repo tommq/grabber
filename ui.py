@@ -54,11 +54,13 @@ class UI:
             user_text_input.focus()
 
             def user_value_changed(a, b, c):
-                timestamp = self.recorder.streamOuter.time
-                pressed_key = input_val.get()[-1:]
-                self.written[timestamp] = pressed_key
-                self.dictionary.update_letter_counts(pressed_key)
-                # print("Keypress at: " + str(self.recorder.streamOuter.time))
+                try:
+                    timestamp = self.recorder.streamOuter.time
+                    pressed_key = input_val.get()[-1:]
+                    self.written[timestamp] = pressed_key
+                    self.dictionary.update_letter_counts(pressed_key)
+                except AttributeError as e:
+                    print("Time attribute unavailable", e)
 
                 if len(input_val.get()) == self.characters_to_write:
                     self.writing_completed(user_text_input, prompt_text)
