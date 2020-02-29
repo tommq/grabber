@@ -26,9 +26,9 @@ class Recorder:
             def callback(indata, frames, time, status):
                 """This is called (from a separate thread) for each audio block."""
                 q.put(indata.copy())
-                if time.outputBufferDacTime < 1:
-                    print(indata)
-                print(time.outputBufferDacTime)
+                # if time.outputBufferDacTime < 1:
+                #     print(indata)
+                # print(time.outputBufferDacTime)
 
 
             filename = config.directory + self.uuid + '.wav'
@@ -36,20 +36,19 @@ class Recorder:
             # Make sure the file is opened before recording anything:
             with sf.SoundFile(filename, mode='x', samplerate=config.samplerate,
                               channels=config.channels, subtype=config.subtype) as audio_file:
-                with sd.InputStream(samplerate=config.samplerate, device=config.device,
+                with sd.InputStream(samplerate=config.samplerate, device=None,
                                     channels=config.channels, callback=callback) as stream:
-                    begin_timestamp = dt.now()
-                    self.streamOuter = stream
+                    begin_timestamp = stream.time
                     print('#' * 80)
                     print('recording from')
                     print('#' * 80)
                     print("Recording start: " + str(begin_timestamp))
+                    self.streamOuter = stream
                     while self.go is True:
                         audio_file.write(q.get())
                     print("Recording stopped")
                     # end_timestamp = utils.get_timestamp()
                     self.save_start(begin_timestamp)
-                    # audio_file.__setattr__("comment", str(begin_timestamp) + '&' + str(end_timestamp))
                     audio_file.close()
                     print("Finished writing file")
 

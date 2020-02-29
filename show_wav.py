@@ -1,50 +1,66 @@
-import wave
-from scipy import signal
 import json
 from datetime import datetime as dt
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+from scipy.io.wavfile import read
+import config
+import matplotlib.patches as mpatches
 
 def dt_from_str(string_input):
     return dt.strptime(string_input, '%Y-%m-%d %H:%M:%S.%f')
 
-signal_wave = wave.open('/home/tomas/Documents/School/Master-thesis/thesis-resources/a485-kb/recordings/51dc68c6.wav', 'r')
-nframes = signal_wave.getnframes()
-print("Have frames: " + str(nframes))
-sample_frequency = 44100
+path = config.directory
+filename = '47fb06e7'
+samplerate, input_data = read(path + filename + ".wav")
+print("new has: " + str(len(input_data)))
 
-data = np.frombuffer(signal_wave.readframes(sample_frequency), dtype=np.int32)
+with open(path + filename + ".json", 'r') as f:
+    key_presses = json.load(f)
 
-key_presses = dict()
-
-with open('/home/tomas/Documents/School/Master-thesis/thesis-resources/a485-kb/recordings/51dc68c6.json', 'r') as f:
-    unicode_dict = json.load(f)
-    for key in unicode_dict.keys():
-        key_presses[dt_from_str(str(key))] = str(unicode_dict[key])
-
-sig = signal_wave.readframes(nframes)
-sig = np.frombuffer(sig, dtype=np.int32)
-print(len(sig))
-sig = sig[:]
-left, right = data[0::2], data[1::2]
+# search = 5099000
+since = 750000
+until = 790000
+input_data = input_data[since:until]
+left, right = input_data[0::2], input_data[1::2]
 lf, rf = abs(np.fft.rfft(left)), abs(np.fft.rfft(right))
 
 start = sorted(key_presses)[0]
 timestamps = sorted(key_presses)[1:]
 
-plt.figure(1)
-a = plt.subplot(211)
-for timestamp in sorted(timestamps):
-    x = (timestamp-start).total_seconds() * 44100
-    print(x)
-    a.axvline(x=x, c='r')
+plt.figure(figsize=(16, 9))
+# a = plt.subplot(211)
 
-a.set_xlabel('time [s]')
-a.set_ylabel('sample value [-]')
-plt.plot(sig)
-c = plt.subplot(212)
-Pxx, freqs, bins, im = c.specgram(sig, NFFT=1024, Fs=16000, noverlap=900)
-c.set_xlabel('Time')
-c.set_ylabel('Frequency')
+for timestamp in sorted(timestamps):
+    x = (float(timestamp) - float(start)) * samplerate
+    if(x > since and x < until):
+        x = x - since
+        print(x)
+        plt.axvline(x=x - (0.03*44100), c='g')
+        plt.axvline(x=x, c='r')
+        plt.axvline(x=x + (0.12*44100), c='b')
+
+def toSeconds(x, pos):
+    return int(x/44100*1000)
+
+
+plt.xlabel('time [ms]')
+plt.ylabel('Amplitude')
+plt.locator_params(nbins=10, axis='y')
+plt.locator_params(nbins=40, axis='x')
+# plt.minorticks_on()
+plt.legend()
+plot = plt.plot(input_data)[0]
+plot.axes.xaxis.set_major_formatter(FuncFormatter(toSeconds))
+
+red_patch = mpatches.Patch(color='red', label='Recorded time of keypress')
+green_patch = mpatches.Patch(color='green', label='Start of audio extraction')
+blue_patch = mpatches.Patch(color='blue', label='End of audio extraction')
+plt.legend(handles=[red_patch, green_patch, blue_patch])
+
+# c = plt.subplot(212)
+# Pxx, freqs, bins, im = c.specgram(input_data, NFFT=1024, Fs=44100, noverlap=900)
+# c.set_xlabel('Time')
+# c.set_ylabel('Frequency')
 plt.show()
 
