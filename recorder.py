@@ -4,7 +4,6 @@ import soundfile as sf
 import threading
 import numpy
 import config
-from datetime import datetime as dt
 
 assert numpy
 
@@ -21,15 +20,10 @@ class Recorder:
     def record(self):
         try:
             q = queue.Queue()
-            print("lala")
 
             def callback(indata, frames, time, status):
                 """This is called (from a separate thread) for each audio block."""
                 q.put(indata.copy())
-                # if time.outputBufferDacTime < 1:
-                #     print(indata)
-                # print(time.outputBufferDacTime)
-
 
             filename = config.directory + self.uuid + '.wav'
 
