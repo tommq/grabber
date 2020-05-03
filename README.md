@@ -12,3 +12,7 @@ Allows to record typing and save both audio and written keys with exact time.
  > pip3 install sounddevice soundfile cffi numpy 
 
  3. configure path to recordings directory in config.py file
+ 
+ # Run main.py to start
+ 
+ > ./main.py 
